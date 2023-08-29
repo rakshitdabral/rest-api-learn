@@ -1,5 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const sendToken = require("../utils/jwtToken");
+const shortid = require('shortid');
+
 
 
 // code to get every user detail
@@ -59,9 +62,10 @@ exports.userLogin = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).send("Invalid credentials.");
     }else{  
+        
         res.status(200).send("login successful");
     }
-
+    
     
   } catch (error) {
     res.status(500).send("Error logging in.");
@@ -72,17 +76,19 @@ exports.userLogin = async (req, res) => {
 
 exports.userSignup = async (req, res) => {
   try {
+    const customKey = shortid.generate();
     const { username, password, phone, email } = req.body;
 
     const userEmailExist = await User.findOne({ email: email });
     const userPhoneExist = await User.findOne({ phone: phone });
 
     if (userEmailExist || userPhoneExist) {
-      res.send("user already exists");
+      res.send("user already exists with provided detail");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
+      key : customKey,
       name: username,
       password: hashedPassword,
       phone: phone,

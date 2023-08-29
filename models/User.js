@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
+    key : {
+        type : String,
+    },
     name:{
         type : String,
         required : true,
@@ -15,7 +18,7 @@ const userSchema = new mongoose.Schema({
         type: Number,
         minlength : 10,
         maxlength : 10,
-        unique : [true, "Email already present"],
+        unique : [true, "Phone Number already present"],
     },
     email :{
         type: String,
@@ -23,12 +26,11 @@ const userSchema = new mongoose.Schema({
         unique : [true, "Email already present"],
         
     },
-    address : [
-        {
-            addressline1 : String
-        }
-    ]
-
+    role : {
+        type : String,
+        enum : ['SELLER', 'BUYER', 'BOTH'],
+        default : 'BOTH'
+    }
 })
 
 //collection

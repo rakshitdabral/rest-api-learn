@@ -1,25 +1,35 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
+
 const productSchema = new mongoose.Schema({
-    owner: {
+    key : {
+        type : String,
+    },
+    sellerId : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    },
+    name : {
         type : String,
         required : true,
     },
-    productdetails: [
-        {
-            productname : String,
-            quantity : Number,
-            quantityunit : String,
-            price : Number,
-        }
-    ],
-    productcall : {
+    desc : {
         type : String,
-        enum : ['BUY', 'SELL'],
-        default : 'BUY'
+        required : true,
+    },
+    price : {
+        type : Number,
+        required : true,
+    },
+    totalQuantity : {
+        type : Number,
+        required : true,
+    },
+    createdAt : {
+        type : Date,
+        default : Date.now,
     }
-
 })
 
 const Product = new mongoose.model('Product', productSchema);
