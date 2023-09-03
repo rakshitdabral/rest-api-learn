@@ -2,7 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const sendToken = require("../utils/jwtToken");
 const shortid = require('shortid');
-
+const jwt =  require("jsonwebtoken")
 
 
 // code to get every user detail
@@ -43,8 +43,25 @@ exports.getUserDetails = async (req, res) => {
   }
 };
 
-// code to login
+//code to verify token middleware
 
+function tokenVerify(req,res,next){
+  const token = req.header("auth-token");
+  if(!token){
+    return res.status(401).send("Access Denied");
+  }
+  try{
+    const verified = jwt.verify(token,"secretkey");
+    req.user = verified;
+    next();
+  }catch(err){
+    res.status(400).send("Invalid Token");
+  }
+}
+
+
+
+// code to login
 exports.userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -62,15 +79,32 @@ exports.userLogin = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).send("Invalid credentials.");
     }else{  
-        
-        res.status(200).send("login successful");
-    }
+
+        jwt.sign({user},'secretkey',{expiresIn:'1h'},(err,token)=>{
+        res.status(200).json({token});
+    })
     
-    
+  } 
   } catch (error) {
     res.status(500).send("Error logging in.");
   }
 };
+
+
+//code to show profile 
+exports.showProfile = async (req,res) => {
+      jwt.verify(tokenVerify,"secretkey",(err, authData)=>{
+          if(err){
+            res.send("Error")
+          }else{
+            res.json({
+              message : "Success",
+              authData
+            })
+          }
+      })
+}
+
 
 // code to register
 
